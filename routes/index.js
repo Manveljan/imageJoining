@@ -13,7 +13,12 @@ var params = [
 ]
 
 router.get('/', function (req, res) {
-  return lib.imageJoin(params).then(function (result) {
+  if (params.length < 1) {
+    return res.json({status: 'error', message: 'Params is empty'})
+  }
+  return lib.drawedImagesStream(params).then(function (streams) {
+    return Promise.map(streams, lib.writeImageToDisk)
+  }).then(function (result) {
     return res.json({status: result ? 'ok' : 'error'})
   })
 })
